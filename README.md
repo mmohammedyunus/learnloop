@@ -1,8 +1,8 @@
-# ⚡ StriveHub — The Student Opportunities & Career Platform
+# ⚡ LearnLoop — The Student Opportunities & Learning Network
 
 > Discover, track, and apply to verified student opportunities matched directly to your profile.
 
-**StriveHub** is a modern, responsive web application designed to connect students with curated internships, hackathons, graduate placements, and scholarships.
+**LearnLoop** is a modern, responsive web platform designed to empower students by centralizing verified internships, hackathons, graduate placements, and scholarships in one intuitive hub.
 
 ---
 
@@ -34,8 +34,8 @@ Make sure you have [Node.js](https://nodejs.org/) installed (v18 or newer recomm
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/mmohammedyunus/strivehub.git
-   cd strivehub
+   git clone https://github.com/mmohammedyunus/learnloop.git
+   cd learnloop
    ```
 
 2. **Install dependencies:**

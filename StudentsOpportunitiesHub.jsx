@@ -20,38 +20,40 @@ async function hashPassword(password) {
 }
 
 async function registerUser({ name, email, password, college, department, year }) {
-  const key = `strivehub_users:${email.toLowerCase()}`;
-  if (localStorage.getItem(key) || localStorage.getItem(`internpulse_users:${email.toLowerCase()}`) || localStorage.getItem(`soh_users:${email.toLowerCase()}`)) {
+  const key = `learnloop_users:${email.toLowerCase()}`;
+  if (localStorage.getItem(key) || localStorage.getItem(`strivehub_users:${email.toLowerCase()}`) || localStorage.getItem(`internpulse_users:${email.toLowerCase()}`) || localStorage.getItem(`soh_users:${email.toLowerCase()}`)) {
     throw new Error("An account with this email already exists.");
   }
   const passwordHash = await hashPassword(password);
   const user = { name, email: email.toLowerCase(), passwordHash, college, department, year, createdAt: new Date().toISOString() };
   localStorage.setItem(key, JSON.stringify(user));
-  localStorage.setItem("strivehub_session", email.toLowerCase());
+  localStorage.setItem("learnloop_session", email.toLowerCase());
   return user;
 }
 
 async function loginUser({ email, password }) {
-  const key = `strivehub_users:${email.toLowerCase()}`;
-  const legacyKey1 = `internpulse_users:${email.toLowerCase()}`;
-  const legacyKey2 = `soh_users:${email.toLowerCase()}`;
-  const raw = localStorage.getItem(key) || localStorage.getItem(legacyKey1) || localStorage.getItem(legacyKey2);
+  const key = `learnloop_users:${email.toLowerCase()}`;
+  const legacyKey1 = `strivehub_users:${email.toLowerCase()}`;
+  const legacyKey2 = `internpulse_users:${email.toLowerCase()}`;
+  const legacyKey3 = `soh_users:${email.toLowerCase()}`;
+  const raw = localStorage.getItem(key) || localStorage.getItem(legacyKey1) || localStorage.getItem(legacyKey2) || localStorage.getItem(legacyKey3);
   if (!raw) throw new Error("No account found with this email.");
   const user = JSON.parse(raw);
   const hash = await hashPassword(password);
   if (hash !== user.passwordHash) throw new Error("Incorrect password.");
-  localStorage.setItem("strivehub_session", email.toLowerCase());
+  localStorage.setItem("learnloop_session", email.toLowerCase());
   return user;
 }
 
 async function getSessionUser() {
-  const email = localStorage.getItem("strivehub_session") || localStorage.getItem("internpulse_session") || localStorage.getItem("soh_session");
+  const email = localStorage.getItem("learnloop_session") || localStorage.getItem("strivehub_session") || localStorage.getItem("internpulse_session") || localStorage.getItem("soh_session");
   if (!email) return null;
-  const raw = localStorage.getItem(`strivehub_users:${email}`) || localStorage.getItem(`internpulse_users:${email}`) || localStorage.getItem(`soh_users:${email}`);
+  const raw = localStorage.getItem(`learnloop_users:${email}`) || localStorage.getItem(`strivehub_users:${email}`) || localStorage.getItem(`internpulse_users:${email}`) || localStorage.getItem(`soh_users:${email}`);
   return raw ? JSON.parse(raw) : null;
 }
 
 async function logoutUser() {
+  localStorage.removeItem("learnloop_session");
   localStorage.removeItem("strivehub_session");
   localStorage.removeItem("internpulse_session");
   localStorage.removeItem("soh_session");
@@ -438,7 +440,7 @@ function OppCard({ opp, saved, onToggleSave, onOpen, user }) {
 }
 
 /* ---------------------------------------------------------------
-   MAIN NAVBAR — STRIVEHUB
+   MAIN NAVBAR — LEARNLOOP
 ---------------------------------------------------------------- */
 function NavBar({ view, setView, mobileOpen, setMobileOpen, currentUser, onLogout, savedCount, applicationsCount }) {
   const links = [
@@ -446,13 +448,13 @@ function NavBar({ view, setView, mobileOpen, setMobileOpen, currentUser, onLogou
     { id: "dashboard", label: "My Dashboard" },
     { id: "admin", label: "Admin" },
   ];
-  const initial = currentUser?.name?.[0]?.toUpperCase() || "S";
+  const initial = currentUser?.name?.[0]?.toUpperCase() || "L";
 
   return (
     <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         
-        {/* StriveHub Logo */}
+        {/* LearnLoop Logo */}
         <button
           onClick={() => setView("home")}
           className="flex items-center gap-2.5 text-left group"
@@ -463,7 +465,7 @@ function NavBar({ view, setView, mobileOpen, setMobileOpen, currentUser, onLogou
           <div>
             <div className="flex items-center gap-1.5">
               <span className="font-extrabold text-base sm:text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-200 bg-clip-text text-transparent">
-                Strive<span className="text-amber-400">Hub</span>
+                Learn<span className="text-amber-400">Loop</span>
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" title="Live Pulse" />
             </div>
@@ -528,7 +530,7 @@ function NavBar({ view, setView, mobileOpen, setMobileOpen, currentUser, onLogou
                 onClick={() => setView("register")}
                 className="text-xs font-semibold px-4 py-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 shadow-md shadow-amber-500/20 hover:brightness-110 active:scale-95 transition-all"
               >
-                Join StriveHub
+                Join LearnLoop
               </button>
             </div>
           )}
@@ -608,7 +610,7 @@ function NavBar({ view, setView, mobileOpen, setMobileOpen, currentUser, onLogou
                 }}
                 className="text-xs font-bold py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 text-center min-h-[44px] shadow"
               >
-                Join StriveHub
+                Join LearnLoop
               </button>
             </div>
           )}
@@ -619,7 +621,7 @@ function NavBar({ view, setView, mobileOpen, setMobileOpen, currentUser, onLogou
 }
 
 /* ---------------------------------------------------------------
-   HERO & HOME VIEW — STRIVEHUB
+   HERO & HOME VIEW — LEARNLOOP
 ---------------------------------------------------------------- */
 function Home({ setView, query, setQuery, onSelectCategory }) {
   const quickTags = [
@@ -642,7 +644,7 @@ function Home({ setView, query, setQuery, onSelectCategory }) {
           {/* Badge */}
           <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/80 text-amber-400 text-[11px] sm:text-xs font-semibold shadow-inner mb-4 sm:mb-6">
             <Activity size={13} className="text-amber-400 shrink-0 animate-pulse" />
-            <span>StriveHub — 650+ Live Student Opportunities</span>
+            <span>LearnLoop — 650+ Live Student Opportunities</span>
           </div>
 
           {/* Main Title */}
@@ -792,13 +794,13 @@ function Home({ setView, query, setQuery, onSelectCategory }) {
         <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 sm:p-12 text-white border border-slate-800 shadow-2xl">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20 mb-3 sm:mb-4">
-              <Activity size={13} className="text-amber-400 animate-pulse" /> StriveHub Match Engine
+              <Activity size={13} className="text-amber-400 animate-pulse" /> LearnLoop Match Engine
             </span>
             <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
               Get Notified When Perfect Matches Drop
             </h2>
             <p className="mt-2.5 sm:mt-3 text-slate-300 text-xs sm:text-base leading-relaxed">
-              Create your profile with your degree, tech stack, and career targets. StriveHub calculates match percentage in real-time and surfaces high-value opportunities.
+              Create your profile with your degree, tech stack, and career targets. LearnLoop calculates match percentage in real-time and surfaces high-value opportunities.
             </p>
             <div className="mt-5 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <button
@@ -1161,7 +1163,7 @@ function Detail({ opp, saved, toggleSave, back, onApply, applied }) {
             </div>
 
             <div className="mt-5 pt-4 border-t border-slate-100 text-[11px] text-slate-500 text-center space-y-1">
-              <p>🛡️ Zero application fees on StriveHub</p>
+              <p>🛡️ Zero application fees on LearnLoop</p>
               <p>⚡ Direct student submission</p>
             </div>
           </div>
@@ -1601,7 +1603,7 @@ function Admin({ opps, setOpps }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 sm:pb-6 border-b border-slate-200">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 flex items-center gap-2">
-            <Shield size={24} className="text-indigo-600 shrink-0" /> StriveHub Admin
+            <Shield size={24} className="text-indigo-600 shrink-0" /> LearnLoop Admin
           </h1>
           <p className="text-xs text-slate-500 mt-1">Manage opportunities, verification badges, and system moderation.</p>
         </div>
@@ -1723,7 +1725,7 @@ function Admin({ opps, setOpps }) {
 }
 
 /* ---------------------------------------------------------------
-   AUTH SCREEN (LOGIN / REGISTER) — STRIVEHUB
+   AUTH SCREEN (LOGIN / REGISTER) — LEARNLOOP
 ---------------------------------------------------------------- */
 function AuthScreen({ mode, setMode, onAuthed }) {
   const [form, setForm] = useState({ name: "", email: "", password: "", college: "", department: "", year: "" });
@@ -1755,7 +1757,7 @@ function AuthScreen({ mode, setMode, onAuthed }) {
             <Activity size={24} className="stroke-[2.5]" />
           </div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-4 tracking-tight">
-            {mode === "register" ? "Join StriveHub" : "Welcome Back"}
+            {mode === "register" ? "Join LearnLoop" : "Welcome Back"}
           </h1>
           <p className="text-xs text-slate-500 mt-1">
             {mode === "register"
@@ -1851,7 +1853,7 @@ function AuthScreen({ mode, setMode, onAuthed }) {
 
         <div className="text-center mt-6 pt-5 border-t border-slate-100">
           <p className="text-xs text-slate-500">
-            {mode === "register" ? "Already have an account?" : "New to StriveHub?"}{" "}
+            {mode === "register" ? "Already have an account?" : "New to LearnLoop?"}{" "}
             <button
               onClick={() => setMode(mode === "register" ? "login" : "register")}
               className="font-bold text-amber-600 hover:underline ml-1"
@@ -1939,7 +1941,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950">
       
-      {/* StriveHub Navigation */}
+      {/* LearnLoop Navigation */}
       <NavBar
         view={view}
         setView={goToView}
@@ -1956,7 +1958,7 @@ export default function App() {
         {checkingSession ? (
           <div className="flex items-center justify-center py-32 text-slate-400 text-sm">
             <Activity className="w-5 h-5 text-amber-500 animate-spin mr-2" />
-            Connecting to StriveHub...
+            Connecting to LearnLoop...
           </div>
         ) : (
           <>
@@ -2019,14 +2021,14 @@ export default function App() {
         )}
       </main>
 
-      {/* StriveHub Footer */}
+      {/* LearnLoop Footer */}
       <footer className="bg-slate-900 border-t border-slate-800 text-slate-400 py-8 sm:py-10 mt-auto pb-24 lg:pb-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-lg bg-amber-400 flex items-center justify-center text-slate-950 font-bold text-xs shrink-0">
               <Activity size={13} className="stroke-[3]" />
             </div>
-            <span className="text-white font-bold text-sm tracking-tight">Strive<span className="text-amber-400">Hub</span></span>
+            <span className="text-white font-bold text-sm tracking-tight">Learn<span className="text-amber-400">Loop</span></span>
             <span className="text-xs text-slate-500">· The Opportunity Network for Students</span>
           </div>
           <p className="text-xs text-slate-500 text-center sm:text-right">
